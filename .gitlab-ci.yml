@@ -1,0 +1,117 @@
+variables:
+  TF_ROOT: ${CI_PROJECT_DIR}/infrastructure
+  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_PROJECT_NAME}
+  TF_VAR_COMMIT_SHA: $CI_COMMIT_SHORT_SHA
+
+cache:
+  key: ${CI_PROJECT_NAME}
+  paths:
+    - ${TF_ROOT}/.terraform
+
+stages:
+  - test
+  - build
+  - init
+  - prepare
+  - validate
+  - plan
+  - deploy
+
+lint-readme:
+  image: node:18.3.0
+  stage: test
+  needs: []
+  script:
+    - npx prettier --check */**.md *.md
+
+test:
+  image: node:18.3.0
+  stage: test
+  needs: []
+  script:
+    - npm install 
+    - npm run test
+
+build:
+  image: node:18.3.0
+  stage: build
+  needs: []
+  script:
+    - npm install 
+    - npm run build
+  artifacts:
+    paths:
+      - build
+
+init:
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/1.0
+  stage: prepare
+  needs: []
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform init
+
+validate:
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/1.0
+  stage: validate
+  needs:
+    - init
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform validate
+
+plan:
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/1.0
+  stage: plan
+  needs:
+    - validate
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  artifacts:
+    name: plan
+    paths:
+      - ${TF_ROOT}/plan.cache
+    reports:
+      terraform: ${TF_ROOT}/plan.json
+
+apply:
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/1.0
+  stage: deploy
+  needs:
+    - plan
+  environment:
+    name: production
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform apply
+  dependencies:
+    - plan
+  only:
+    - main
+
+
+deploy:
+  image: garland/aws-cli-docker
+  stage: deploy
+  needs:
+    - build
+    - test
+    - apply
+  dependencies:
+    - build
+  script:
+    - aws s3 sync --delete build s3://$S3_BUCKETNAME
+  only:
+    - master
+
+invalidate-cache:
+  image: garland/aws-cli-docker
+  stage: invalidate-cache
+  needs:
+    - deploy
+  script:
+    - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths '/*'
+  only:
+    - master
