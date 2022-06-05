@@ -27,7 +27,9 @@ function MergeJson() {
               ...handleJsonState(state[currentVal]),
             }),
             {}
-          )
+          ),
+          null,
+          "  "
         )}
       </pre>
       <div>
