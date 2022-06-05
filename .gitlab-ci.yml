@@ -17,7 +17,6 @@ stages:
   - validate
   - plan
   - deploy
-  - invalidate-cache
 
 lint-readme:
   image: node:18
@@ -89,30 +88,5 @@ apply:
     - gitlab-terraform apply
   dependencies:
     - plan
-  only:
-    - master
-
-
-deploy:
-  image: garland/aws-cli-docker
-  stage: deploy
-  needs:
-    - build
-    - test
-    - apply
-  dependencies:
-    - build
-  script:
-    - aws s3 sync --delete build s3://$S3_BUCKETNAME
-  only:
-    - master
-
-invalidate-cache:
-  image: garland/aws-cli-docker
-  stage: invalidate-cache
-  needs:
-    - deploy
-  script:
-    - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths '/*'
   only:
     - master
