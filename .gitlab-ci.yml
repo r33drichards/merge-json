@@ -16,6 +16,7 @@ stages:
   - validate
   - plan
   - deploy
+  - invalidate-cache
 
 lint-readme:
   image: node:18.3.0
