@@ -69,6 +69,7 @@ plan:
   script:
     - cd ${TF_ROOT}
     - env
+    - terraform output domain
     - gitlab-terraform plan
     - gitlab-terraform plan-json
   artifacts:
