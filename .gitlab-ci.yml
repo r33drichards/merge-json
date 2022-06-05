@@ -32,16 +32,20 @@ test:
     - npm install 
     - npm run test
 
-build:
+pages:
   image: node:18
   stage: build
   needs: []
   script:
     - npm install 
     - npm run build
+    - mv public public.bak
+    - mv build public
   artifacts:
     paths:
-      - build
+      - public
+  only: 
+    - master
 
 init:
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/1.0
