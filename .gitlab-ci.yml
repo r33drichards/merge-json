@@ -2,6 +2,7 @@ variables:
   TF_ROOT: ${CI_PROJECT_DIR}
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_PROJECT_NAME}
   TF_VAR_COMMIT_SHA: $CI_COMMIT_SHORT_SHA
+  TF_VAR_domain: mjson.xyz
 
 cache:
   key: ${CI_PROJECT_NAME}
@@ -67,6 +68,7 @@ plan:
     - validate
   script:
     - cd ${TF_ROOT}
+    - env
     - gitlab-terraform plan
     - gitlab-terraform plan-json
   artifacts:
