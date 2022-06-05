@@ -8,15 +8,15 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 on the roadmap to automate this w/ https://registry.terraform.io/providers/namecheap/namecheap/latest/docs
 
-### gitlab pages and route 53 
+### gitlab pages and route 53
 
-requires manual config 
+requires manual config
 
 https://docs.gitlab.com/ee/user/project/pages/custom_domains_ssl_tls_certification/
 
- - Setting > Pages and select + New domain
--  [get the verification code](https://docs.gitlab.com/ee/user/project/pages/custom_domains_ssl_tls_certification/#2-get-the-verification-code)
-- set `TF_VAR_gitlab_pages_verification_code` and `TF_VAR_domain` in Settings > CI/CD > Variables 
+- Setting > Pages and select + New domain
+- [get the verification code](https://docs.gitlab.com/ee/user/project/pages/custom_domains_ssl_tls_certification/#2-get-the-verification-code)
+- set `TF_VAR_gitlab_pages_verification_code` and `TF_VAR_domain` in Settings > CI/CD > Variables
 
 create an iam user for terraform:
 
@@ -32,7 +32,7 @@ resource "aws_iam_user" "{{ cookiecutter.project_name }}" {
 
 data "template_file" "{{ cookiecutter.project_name }}" {
   template = file("./policies/{{ cookiecutter.project_name }}.json")
-} 
+}
 resource "aws_iam_user_policy" "{{ cookiecutter.project_name }}" {
   name = "{{ cookiecutter.project_name }}"
   user = aws_iam_user.{{ cookiecutter.project_name }}.name
@@ -43,14 +43,14 @@ resource "aws_iam_user_policy" "{{ cookiecutter.project_name }}" {
 ```
 
 configure {{ cookiecutter.gitlab_url }}/{{ cookiecutter.gitlab_account }}/{{ cookiecutter.project_name }}/-/settings/ci_cd
-for with access key terraform user 
+for with access key terraform user
 
 create access key https://console.aws.amazon.com/iam/home#/users/{{ cookiecutter.project_name }}?section=security_credentials
 
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 
-push this repo to the new project on gitlab 
+push this repo to the new project on gitlab
 
 ```shell
 git init --initial-branch=main
@@ -59,7 +59,6 @@ git add .
 git commit -m "Initial commit"
 git push -u origin main
 ```
-
 
 ## Available Scripts
 
