@@ -19,22 +19,21 @@ stages:
   - invalidate-cache
 
 lint-readme:
-  image: node:18.3.0
+  image: node:18
   stage: test
   needs: []
   script:
     - npx prettier --check */**.md *.md
 
 test:
-  image: node:18.3.0
-  stage: test
+  image: node:18
   needs: []
   script:
     - npm install 
     - npm run test
 
 build:
-  image: node:18.3.0
+  image: node:18
   stage: build
   needs: []
   script:
