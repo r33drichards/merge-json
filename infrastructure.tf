@@ -37,7 +37,7 @@ provider "aws" {
 }
 
 data "aws_route53_zone" "zone" {
-  name         = "mjson.xyz"
+  name         = var.domain
   private_zone = false
 }
 
