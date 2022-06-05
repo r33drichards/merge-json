@@ -23,7 +23,7 @@ lint-readme:
   stage: test
   needs: []
   script:
-    - npx prettier --check */**.md *.md
+    - npx prettier --check *.md
 
 test:
   image: node:18
