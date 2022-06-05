@@ -68,7 +68,6 @@ plan:
     - validate
   script:
     - cd ${TF_ROOT}
-    - env
     - gitlab-terraform plan
     - gitlab-terraform plan-json
   artifacts:
