@@ -48,7 +48,7 @@ function MergeJson() {
 
       <button
         onClick={() =>
-          dispatch((state) => ({ ...state, count: Math.max(state.count - 1) }))
+          dispatch((state) => ({ ...state, count: Math.max(state.count - 1, 0) }))
         }
       >
         -
