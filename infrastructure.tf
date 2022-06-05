@@ -23,7 +23,6 @@ variable "gitlab_pages_verification_code" {
 
 variable "domain" {
     description = "top level domain of the website eg: example.com"
-    default = "mjson.xyz"
 }
 
 variable "gitlab_ip_addr" {
