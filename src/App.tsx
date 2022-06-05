@@ -13,7 +13,7 @@ function reducer(state: any, action: (state: any) => any) {
   return action(state);
 }
 
-function MergeJsonForm() {
+function MergeJson() {
   const [state, dispatch] = useReducer(reducer, {
     count: 2,
   });
@@ -66,7 +66,7 @@ function App() {
   // Declare a new state variable, which we'll call "count"
   return (
     <div className="App">
-      <MergeJsonForm />
+      <MergeJson />
     </div>
   );
 }
