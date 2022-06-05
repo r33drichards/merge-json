@@ -24,8 +24,10 @@ variable "gitlab_pages_verification_code" {
 variable "domain" {
     description = "top level domain of the website eg: example.com"
 }
+
 output "domain" {
-]  value = var.domain
+ value = var.domain
+}
 
 variable "gitlab_ip_addr" {
   default = "35.185.44.232"
