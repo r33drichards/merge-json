@@ -89,7 +89,7 @@ apply:
   dependencies:
     - plan
   only:
-    - main
+    - master
 
 
 deploy:
