@@ -1,25 +1,38 @@
 import { useReducer } from "react";
 import "./App.css";
 
-function handleJsonState(value: any) {
+const handleJsonState = (value: any) => {
   try {
     return JSON.parse(value);
   } catch (e) {
     return {};
   }
-}
+};
 
 function reducer(state: any, action: (state: any) => any) {
   return action(state);
 }
 
-// TODO: this is a little annoying because it relies on passing in state to 
-// create the reducer function. for the list of state id's, should 
-// map handleJsonState(state[currentVal]) then reduce to merge json.
-const mergeJsonNaiveREducer = (state: any) => (acc: any, currentVal: any) => ({
+const mergeObjects = (acc: any, currentVal: any) => ({
   ...acc,
-  ...handleJsonState(state[currentVal]),
+  ...currentVal,
 });
+
+const textAreaMapper =
+  (state: any, dispatch: (state: any) => any) => (idx: number) =>
+    (
+      <textarea
+        onChange={(event) =>
+          dispatch((state: any) => ({ ...state, [idx]: event.target.value }))
+        }
+        value={idx in state ? state[idx] : ""}
+      ></textarea>
+    );
+
+
+function RenderJSON({json} :{json: object}){
+  return <pre>{JSON.stringify(json, null, " ")}</pre>
+}
 
 function MergeJson() {
   const [state, dispatch] = useReducer(reducer, {
@@ -30,23 +43,16 @@ function MergeJson() {
 
   return (
     <>
-      <pre>
-        {JSON.stringify(
-          stateKeys.reduce(mergeJsonNaiveREducer(state), {}),
-          null,
-          "  "
-        )}
-      </pre>
-      <div>
-        {stateKeys.map((idx) => (
-          <textarea
-            onChange={(event) =>
-              dispatch((state) => ({ ...state, [idx]: event.target.value }))
-            }
-            value={idx in state ? state[idx] : ""}
-          ></textarea>
-        ))}
-      </div>
+    <RenderJSON json={
+          stateKeys
+          .map((i) => state[i])     // get state values for each textarea
+          .map(handleJsonState)     // transform to json if possible
+          .reduce(mergeObjects, {}) // reduce to merge json
+    } / >
+
+      {/* set dispatch function for each textarea to update state when edited */}
+      <div>{stateKeys.map(textAreaMapper(state, dispatch))}</div> 
+
       <button onClick={() => dispatch((_) => ({ count: 2 }))}>reset</button>
 
       <button
