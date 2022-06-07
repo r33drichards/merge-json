@@ -24,7 +24,7 @@ const updateTextArea = (idx: string, value: string) => (state: any) => ({
 });
 
 const textAreaEventHandler =
-  (event: any) => (idx: string, dispatch: (state: any) => any) =>
+  (idx: string, dispatch: (state: any) => any) => (event: any) =>
     dispatch(updateTextArea(idx, event.target.value));
 
 const textAreaMapper =
@@ -43,7 +43,7 @@ const textAreaMapper =
           delete
         </button>
         <textarea
-          onChange={(event) => textAreaEventHandler(event)(idx, dispatch)}
+          onChange={textAreaEventHandler(idx, dispatch)}
           value={state[idx]}
         ></textarea>
       </>
