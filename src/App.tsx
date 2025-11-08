@@ -1,4 +1,5 @@
 import { useReducer } from "react";
+import Editor from "@monaco-editor/react";
 import "./App.css";
 
 const handleJsonState = (value: any) => {
@@ -23,14 +24,14 @@ const updateTextArea = (idx: string, value: string) => (state: any) => ({
   [idx]: value,
 });
 
-const textAreaEventHandler =
-  (idx: string, dispatch: (state: any) => any) => (event: any) =>
-    dispatch(updateTextArea(idx, event.target.value));
+const editorChangeHandler =
+  (idx: string, dispatch: (state: any) => any) => (value: string | undefined) =>
+    dispatch(updateTextArea(idx, value || ""));
 
-const textAreaMapper =
+const editorMapper =
   (state: any, dispatch: (state: any) => any) => (idx: string) =>
     (
-      <>
+      <div key={idx} style={{ marginBottom: "20px", border: "1px solid #ccc", padding: "10px" }}>
         <button
           onClick={() =>
             dispatch((state: any) => {
@@ -39,14 +40,25 @@ const textAreaMapper =
               return newstate;
             })
           }
+          style={{ marginBottom: "10px" }}
         >
           delete
         </button>
-        <textarea
-          onChange={textAreaEventHandler(idx, dispatch)}
+        <Editor
+          height="200px"
+          defaultLanguage="json"
           value={state[idx]}
-        ></textarea>
-      </>
+          onChange={editorChangeHandler(idx, dispatch)}
+          options={{
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            fontSize: 14,
+            tabSize: 2,
+            formatOnPaste: true,
+            formatOnType: true,
+          }}
+        />
+      </div>
     );
 
 function RenderJSON({ json }: { json: object }) {
@@ -75,8 +87,8 @@ function MergeJson({ initialState }: { initialState: any }) {
         }
       />
 
-      {/* set dispatch function for each textarea to update state when edited */}
-      <div>{Object.keys(state).map(textAreaMapper(state, dispatch))}</div>
+      {/* set dispatch function for each editor to update state when edited */}
+      <div>{Object.keys(state).map(editorMapper(state, dispatch))}</div>
 
       <button onClick={() => dispatch((_) => initialState)}>reset</button>
       <button
