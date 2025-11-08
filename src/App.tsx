@@ -59,6 +59,23 @@ const editorMapper =
             tabSize: 2,
             formatOnPaste: true,
             formatOnType: true,
+            scrollbar: {
+              alwaysConsumeMouseWheel: false,
+            },
+          }}
+          onMount={(editor) => {
+            // Only capture scroll when editor is focused
+            editor.onDidFocusEditorText(() => {
+              editor.updateOptions({
+                scrollbar: { alwaysConsumeMouseWheel: true },
+              });
+            });
+            
+            editor.onDidBlurEditorText(() => {
+              editor.updateOptions({
+                scrollbar: { alwaysConsumeMouseWheel: false },
+              });
+            });
           }}
         />
       </div>
