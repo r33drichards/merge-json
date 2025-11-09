@@ -1,5 +1,6 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import "./App.css";
+import * as yaml from "js-yaml";
 
 const handleJsonState = (value: any) => {
   try {
@@ -7,6 +8,21 @@ const handleJsonState = (value: any) => {
   } catch (e) {
     return {};
   }
+};
+
+const handleYamlState = (value: any) => {
+  try {
+    return yaml.load(value) as object;
+  } catch (e) {
+    return {};
+  }
+};
+
+const handleState = (value: any, format: "json" | "yaml") => {
+  if (format === "yaml") {
+    return handleYamlState(value);
+  }
+  return handleJsonState(value);
 };
 
 function reducer(state: any, action: (state: any) => any) {
@@ -49,10 +65,6 @@ const textAreaMapper =
       </>
     );
 
-function RenderJSON({ json }: { json: object }) {
-  return <pre>{JSON.stringify(json, null, " ")}</pre>;
-}
-
 function newID(state: any): string {
   let num = Math.random() + "";
   while (num in state) {
@@ -63,17 +75,48 @@ function newID(state: any): string {
 
 function MergeJson({ initialState }: { initialState: any }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [format, setFormat] = useState<"json" | "yaml">("json");
+  const [outputFormat, setOutputFormat] = useState<"json" | "yaml">("json");
+
+  const mergedObject = Object.keys(state)
+    .map((i) => state[i]) // get state values for each textarea
+    .map((val) => handleState(val, format)) // transform to json/yaml if possible
+    .reduce(mergeObjects, {}); // reduce to merge objects
 
   return (
     <>
-      <RenderJSON
-        json={
-          Object.keys(state)
-            .map((i) => state[i]) // get state values for each textarea
-            .map(handleJsonState) // transform to json if possible
-            .reduce(mergeObjects, {}) // reduce to merge json
-        }
-      />
+      <div style={{ marginBottom: "20px" }}>
+        <label>
+          Input Format:{" "}
+          <select
+            value={format}
+            onChange={(e) => setFormat(e.target.value as "json" | "yaml")}
+          >
+            <option value="json">JSON</option>
+            <option value="yaml">YAML</option>
+          </select>
+        </label>
+        {" | "}
+        <label>
+          Output Format:{" "}
+          <select
+            value={outputFormat}
+            onChange={(e) => setOutputFormat(e.target.value as "json" | "yaml")}
+          >
+            <option value="json">JSON</option>
+            <option value="yaml">YAML</option>
+          </select>
+        </label>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Merged Output:</h3>
+        <pre>
+          {outputFormat === "json"
+            ? JSON.stringify(mergedObject, null, 2)
+            : yaml.dump(mergedObject)}
+        </pre>
+      </div>
 
       {/* set dispatch function for each textarea to update state when edited */}
       <div>{Object.keys(state).map(textAreaMapper(state, dispatch))}</div>
